@@ -35,7 +35,7 @@ async def simulate_device(device_id, redis_client):
         await asyncio.sleep(random.uniform(1, 4))
 
 async def main():
-    redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True, db=0)
+    redis_client = redis.Redis(host='redis', port=6379, decode_responses=True, db=0)
 
     # Configura múltiples dispositivos simulados (puedes ajustar según tus necesidades)
     device_ids = ["device1", "device2", "device3"]

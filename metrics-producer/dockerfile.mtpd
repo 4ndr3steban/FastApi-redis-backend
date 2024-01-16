@@ -1,0 +1,18 @@
+# Usa una imagen base de Python
+FROM python:3.11.1
+
+# Establece el directorio de trabajo
+WORKDIR /app
+
+# Copia los archivos de requerimientos e instala las dependencias
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# Copia el código del microservicio al contenedor
+COPY producer.py producer.py
+
+# Expone el puerto en el que el microservicio está escuchando
+EXPOSE 8003
+
+# Comando para ejecutar el microservicio
+CMD ["python", "producer.py"]

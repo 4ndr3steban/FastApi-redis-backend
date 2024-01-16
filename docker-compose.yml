@@ -1,0 +1,75 @@
+version: '3.10'
+
+services:
+  mydatabasefrb:
+    image: mysql:latest
+    container_name: mydatabasefrbcontainer
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASS}
+      MYSQL_DATABASE: ${MYSQL_DB}
+    ports:
+      - "3306:3306"
+
+  backendfrb:
+    build: 
+      context: ./fastapi-crud
+      dockerfile: dockerfile.api
+    image: fastapiback
+    container_name: myapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mydatabasefrb
+    environment:
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASS=${MYSQL_PASS}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT}
+    volumes:
+      - ./fastapi-crud:/app
+
+  alertconsumer:
+    build:
+      context: ./alert-consumer
+      dockerfile: dockerfile.alcm
+    image: alertimg
+    container_name: myalert
+    environment:
+      - STREAM_KEY=${STREAM_KEY}
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+  
+  metricsconsumer:
+    build:
+      context: ./metrics-consumer
+      dockerfile: dockerfile.mtcm
+    image: consumerimg
+    container_name: myconsumer
+    environment:
+      - STREAM_KEY=${STREAM_KEY}
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+      - backendfrb
+  
+  metricsproducer:
+    build:
+      context: ./metrics-producer
+      dockerfile: dockerfile.mtpd
+    image: producerimg
+    container_name: myproducer
+    environment:
+      - STREAM_KEY=${STREAM_KEY}
+    ports:
+      - "8003:8003"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"

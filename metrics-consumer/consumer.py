@@ -43,7 +43,7 @@ async def consume_metrics(redis_client):
             await asyncio.sleep(5)  # Espera antes de volver a intentar
 
 async def main():
-    redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True, db=0)
+    redis_client = redis.Redis(host='redis', port=6379, decode_responses=True, db=0)
 
     # Crea el consumidor de métricas en un bucle asyncio
     await consume_metrics(redis_client)
